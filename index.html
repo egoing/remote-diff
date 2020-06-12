@@ -8,30 +8,36 @@
         body{margin:0;padding:0;}
         form{
             display: grid;
-            grid-template-columns: 1rem 1fr 1rem 1fr 1rem 4rem 1rem ;
-        }    
+            grid-template-columns: 1fr 1rem 1fr 1rem 4rem;
+        } 
+        #control{
+            padding:10px;
+        } 
     </style>
 </head>
 <body>
-<p id="control">
-    <form>
-            <div class="spacer"></div>
-            <input type="text" name="left" placeholder="URL1">
-            <div class="spacer"></div>
-            <input type="text" name="right"  placeholder="URL2">
-            <div class="spacer"></div>
-            <input type="submit">
-            <div class="spacer"></div>
-    </form>
-</p>
-<div id="container" style="width:100vw;height:500px;border:1px solid grey"></div>
+    <div id="root">
+        <div id="control">
+            <form>
+                    <input type="text" name="left" placeholder="URL1">
+                    <div class="spacer"></div>
+                    <input type="text" name="right"  placeholder="URL2">
+                    <div class="spacer"></div>
+                    <input type="submit" value="비교">
+            </form>
+        </div>
+        <div id="container" style="width:100vw;border:1px solid grey"></div>
+    </div>
+
 <script src="monaco-editor/min/vs/loader.js"></script>
 <script>
-
+    function resize(){
+        document.querySelector('#container').style.height = (document.documentElement.clientHeight - document.querySelector('#control').offsetHeight) + 'px';
+        diffEditor.layout();
+    }
     function initEditor(left, right){
-        require.config({ paths: { 'vs': 'monaco-editor/min/vs' }});
+        require.config({ paths: { 'vs': 'monaco-editor/min/vs' , 'automaticLayout':true}});
         require(['vs/editor/editor.main'], function() {
-            
             async.parallel([
                 function(callback) {
                     fetch(left)
@@ -48,11 +54,17 @@
                 var originalModel = monaco.editor.createModel(results[0], "text/plain");
                 var modifiedModel = monaco.editor.createModel(results[1], "text/plain");
 
-                var diffEditor = monaco.editor.createDiffEditor(document.getElementById("container"));
+                window.diffEditor = monaco.editor.createDiffEditor(document.getElementById("container"));
                 diffEditor.setModel({
                     original: originalModel,
                     modified: modifiedModel
                 });
+
+                window.addEventListener("resize", function(){
+                    resize();
+                    diffEditor.layout();
+                });
+                resize();
             });
         });
     }
@@ -65,6 +77,7 @@
     if(left && right){
         initEditor(left, right);
     }
+    
 </script>
 </body>
 </html>
