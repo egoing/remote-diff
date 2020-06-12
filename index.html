@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/3.2.0/async.min.js"></script>
+    <style>
+        body{margin:0;padding:0;}
+        form{
+            display: grid;
+            grid-template-columns: 1rem 1fr 1rem 1fr 1rem 4rem 1rem ;
+        }    
+    </style>
+</head>
+<body>
+<p id="control">
+    <form>
+            <div class="spacer"></div>
+            <input type="text" name="left" placeholder="URL1" value="https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/Account.java">
+            <div class="spacer"></div>
+            <input type="text" name="right"  placeholder="URL2" value="https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/AccountAddVariable.java">
+            <div class="spacer"></div>
+            <input type="submit">
+            <div class="spacer"></div>
+    </form>
+</p>
+<div id="container" style="width:100vw;height:500px;border:1px solid grey"></div>
+<script src="monaco-editor/min/vs/loader.js"></script>
+<script>
+
+    function initEditor(){
+        require.config({ paths: { 'vs': 'monaco-editor/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            
+            async.parallel([
+                function(callback) {
+                    fetch('https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/Account.java')
+                        .then((result)=>result.text())
+                        .then((text)=>callback(null, text));
+                },
+                function(callback) {
+                    fetch('https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/AccountAddVariable.java')
+                        .then((result)=>result.text())
+                        .then((text)=>callback(null, text));
+                }
+            ],
+            function(err, results) {
+                var originalModel = monaco.editor.createModel(results[0], "text/plain");
+                var modifiedModel = monaco.editor.createModel(results[1], "text/plain");
+
+                var diffEditor = monaco.editor.createDiffEditor(document.getElementById("container"));
+                diffEditor.setModel({
+                    original: originalModel,
+                    modified: modifiedModel
+                });
+            });
+        });
+    }
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    if(urlParams.get('left') && urlParams.get('right')){
+        initEditor();
+    }
+
+    
+</script>
+</body>
+</html>
