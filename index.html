@@ -16,9 +16,9 @@
 <p id="control">
     <form>
             <div class="spacer"></div>
-            <input type="text" name="left" placeholder="URL1" value="https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/Account.java">
+            <input type="text" name="left" placeholder="URL1">
             <div class="spacer"></div>
-            <input type="text" name="right"  placeholder="URL2" value="https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/AccountAddVariable.java">
+            <input type="text" name="right"  placeholder="URL2">
             <div class="spacer"></div>
             <input type="submit">
             <div class="spacer"></div>
@@ -28,18 +28,18 @@
 <script src="monaco-editor/min/vs/loader.js"></script>
 <script>
 
-    function initEditor(){
+    function initEditor(left, right){
         require.config({ paths: { 'vs': 'monaco-editor/min/vs' }});
         require(['vs/editor/editor.main'], function() {
             
             async.parallel([
                 function(callback) {
-                    fetch('https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/Account.java')
+                    fetch(left)
                         .then((result)=>result.text())
                         .then((text)=>callback(null, text));
                 },
                 function(callback) {
-                    fetch('https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/AccountAddVariable.java')
+                    fetch(right)
                         .then((result)=>result.text())
                         .then((text)=>callback(null, text));
                 }
@@ -56,14 +56,15 @@
             });
         });
     }
-
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    if(urlParams.get('left') && urlParams.get('right')){
-        initEditor();
+    const left = urlParams.get('left');
+    const right = urlParams.get('right');
+    document.querySelector('[name=left]').value =  left ? left : 'https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/Account.java';
+    document.querySelector('[name=right]').value =  right ? right : 'https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/AccountAddVariable.java';
+    if(left && right){
+        initEditor(left, right);
     }
-
-    
 </script>
 </body>
 </html>
