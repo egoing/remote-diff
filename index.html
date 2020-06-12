@@ -12,16 +12,20 @@
         } 
         #control{
             padding:10px;
+            
         } 
+        textarea{
+            height:1rem;
+        }
     </style>
 </head>
 <body>
     <div id="root">
         <div id="control">
             <form>
-                    <input type="text" name="left" placeholder="URL1">
+                    <textarea name="left" rows="1" placeholder="URL이나 텍스트를 입력하세요."></textarea>
                     <div class="spacer"></div>
-                    <input type="text" name="right"  placeholder="URL2">
+                    <textarea name="right"  placeholder="URL이나 텍스트를 입력하세요."></textarea>
                     <div class="spacer"></div>
                     <input type="submit" value="비교">
             </form>
@@ -31,6 +35,15 @@
 
 <script src="monaco-editor/min/vs/loader.js"></script>
 <script>
+    function validURL(str) {
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(str);
+    }
     function resize(){
         document.querySelector('#container').style.height = (document.documentElement.clientHeight - document.querySelector('#control').offsetHeight) + 'px';
         diffEditor.layout();
@@ -40,14 +53,22 @@
         require(['vs/editor/editor.main'], function() {
             async.parallel([
                 function(callback) {
-                    fetch(left)
+                    if(validURL(document.querySelector('[name="left"]').value)){
+                        fetch(left)
                         .then((result)=>result.text())
                         .then((text)=>callback(null, text));
+                    } else {
+                        callback(null, document.querySelector('[name="left"]').value);
+                    }
                 },
                 function(callback) {
-                    fetch(right)
+                    if(validURL(document.querySelector('[name="right"]').value)){
+                        fetch(right)
                         .then((result)=>result.text())
                         .then((text)=>callback(null, text));
+                    } else {
+                        callback(null, document.querySelector('[name="right"]').value);
+                    }
                 }
             ],
             function(err, results) {
