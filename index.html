@@ -93,6 +93,8 @@
     const urlParams = new URLSearchParams(queryString);
     const left = urlParams.get('left');
     const right = urlParams.get('right');
+    document.querySelector('[name=left]').value =  left;
+    document.querySelector('[name=right]').value =  right;
     if(left && right){
         initEditor(left, right);
     }
