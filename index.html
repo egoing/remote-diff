@@ -93,8 +93,6 @@
     const urlParams = new URLSearchParams(queryString);
     const left = urlParams.get('left');
     const right = urlParams.get('right');
-    document.querySelector('[name=left]').value =  left ? left : 'https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/Account.java';
-    document.querySelector('[name=right]').value =  right ? right : 'https://raw.githubusercontent.com/egoingsb/java-lesson-example/master/src/AccountAddVariable.java';
     if(left && right){
         initEditor(left, right);
     }
