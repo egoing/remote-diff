@@ -54,7 +54,7 @@
             async.parallel([
                 function(callback) {
                     if(validURL(document.querySelector('[name="left"]').value)){
-                        fetch(left)
+                        fetch(`https://cors-anywhere.herokuapp.com/`+left)
                         .then((result)=>result.text())
                         .then((text)=>callback(null, text));
                     } else {
@@ -63,7 +63,7 @@
                 },
                 function(callback) {
                     if(validURL(document.querySelector('[name="right"]').value)){
-                        fetch(right)
+                        fetch(`https://cors-anywhere.herokuapp.com/`+right)
                         .then((result)=>result.text())
                         .then((text)=>callback(null, text));
                     } else {
